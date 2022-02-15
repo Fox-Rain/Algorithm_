@@ -1,0 +1,175 @@
+< 1.    간선문제의 BFS/DFS >
+간선문제의 DFS/BFS의 경우 간선이 주어질 때 (방향이 없는 간선일 경우)  꼭 둘다 정보를 주어주어야 한다.
+EX) 1 3 이 주어질 경우  --->  1 3     3 1 이렇게 둘을 저장해야한다. 각각 [1], [3]에 넣어야한다.
+
+
+
+
+< 2.    배열을 복사하는 함수 copy() >
+#include <algorithm>
+
+copy(배열의 첫 시작주소, 마지막주소, 복사한 것을 넣을 배열의 첫 주소);
+copy(vec.begin(),vec.end(), copyvec.begin());           <--- vector의 경우
+
+
+
+
+< 3.    cin 과 getline() >    ANCHOR
+* cin의 경우    --->  '\n' 개행문자를 버퍼에서 받아오지 않습니다.
+* geline의 경우 --->   default라고 가정할 시  '\n' 개행문자를 만나면 버퍼에서 받아오므로 버퍼에 '\n'이 남지 않습니다.
+
+따라서 아래와 같은 코드에서는 cin.ignore() 을 통해서 개행문자를 읽어들여서 없애야 합니다.   ( *** cin.ignore() 은 버퍼의 맨처음 문자 1개만 지웁니다.)
+
+int num;
+std::cin >> num;
+
+cin.ignore();       <<--- 여기서 위에서 발생한 개행문자를 읽어 들이므로 아래에서 정상적으로 string을 받을 수 있게 됩니다.
+                          cin.ignore() 이 없을 경우 str은 개행문자를 바로 읽고 종료되게 됩니다.
+string str;
+getline(cin,str);
+
+< 추가예시   cin.ignore() 과 버퍼가 어떻게 작동하는지 >
+    #include <iostream>
+    using namespace std;
+    int main(void)
+    {
+        string s;
+        
+        for(int i=0;i<3;i++)
+        {
+            cin.ignore();
+            getline(cin,s);
+            cout << s << endl;
+        }
+        return 0;
+    }
+
+    입력한 문자열의 첫번째 문자가 삭제되어 출력됩니다.
+
+    (입력)              (결과)
+    1234                234
+    1234                234
+    1234                234
+
+
+
+
+< 4.    회전 알고리즘 >    ANCHOR
+시계방향 회전 알고리즘
+현재 돌리려는 것의 세로 개수가 R, 가로 개수가 C인 직사각형일 때,   cur[i][j]은     nxt[j][세로(R)-i-1] 로 바뀐다.
+
+
+
+
+< 5.    STL deque >
+deque의 경우  stack+queue 구조로써 앞과 뒤 둘다 push,pop이 가능하다.  + indexing  인덱싱을 통해서 접근이 가능하다는 장점도 있다.
+
+
+
+
+< 6.    next_permutation >    ANCHOR
+#include <algorithm> 의 next_permutation을 쓰기전에  next_permutation을 쓸 배열을 꼭 오름차순으로 정렬되어있어야 제대로 작동한다.
+permutation의 구현이 배열(vector)가 내림차순으로 정렬될 경우 더이상 순열을 바꾸지 않도록 구현되어있기 때문이다.
+따라서 next_permutation 구한다면 무조건 배열이 오름차순이어야 한다.
+
+
+
+
+< 7.    6C3, 4C2 와 같이 절반을 뽑는 조합의 경우  next_permutation을 이용해서 중복피하는 법 >    ANCHOR
+next_permutation()의 경우 순열을 뽑아낼때  아래와 같이 대칭적으로 뽑아낸다.  따라서 절반(N/2)에서 next_permutation을 종료해주면 중복을 피할 수 있다.
+
+Ex)             0011
+                0101
+                0110               << 여기서 끊으면 된다. 보다시피 대칭적이다.
+                1001    
+                1010
+                1100
+
+
+
+
+< 8.    iterator을 사용할 때 erase로 원소를 지울 때 주의사항 >    ANCHOR
+iterator을 사용하면서 erase를 하는 메소드의 경우 리턴값으로 방금 지운곳의 iterator을 리턴한다.
+따라서 지우게 되는 경우에는 iterator의 경우 한칸씩 당겨지므로, iter을 증가시지키 않고 그대로 유지 시켜야 한다.  즉, 아래와 같이 코드를 적어주어야한다.
+
+vector<int> vec;
+
+vector<int> itertor:: iter;
+for ( iter=vec.begin(); iter!=vec.end();) 
+{
+    if (삭제의 조건문) 
+        iter = vec.erase(iter);
+    else 
+        iter++;
+}
+
+
+
+
+< 9.    map 의 경우 찾기/삽입/삭제가 O(logN)이다 >    ANCHOR
+내부적으로 red-black-tree로 구현됨. 찾을때 시간복잡도가 logN으로 매우 효율적이다. 단, random access를 지원하지 않는다.
+
+
+
+
+< 10.    for문을 돌릴때 주의사항 >    ANCHOR
+Ex)
+    for(int i=0;i<Q.size();++i)  <--- 이러한 코드의 경우 문제가 발생할 여지가 있다.  왜나햐면 내부 루프에서 Q.size() 값이 바뀔 여지가 있는 코드가 실행되기 때문이다.
+    {
+        if(Q[i]==value)          <--- 이러한 if문에서 pop하게 되면 Q.size()가 줄어들게 되고 의도했던것과 다르게 루프가 돌다가 멈출 수 있다.
+            Q.pop_back();
+    }
+
+해결코드)
+    int Qs = Q.size();
+    for(int i=0;i<Qs;++i)        <--- 해결방안으로 이런식으로 Q.size()와 같이 변할수 있는 부분은 상수로 처음에 받아서 루프에 넣어주는 식으로 바꾸면 된다.
+    {
+        if(...)
+            ....
+    }
+
+
+
+
+< 11.    max(),min() 함수 >
+#include <algorithm> 헤더에 존재하는 함수 max,min()은 3개이상의 인수를 넣으려고 할때  배열로 넣어주어야한다.  Ex) max({x,y,z}) (o)   max(x,y,z) (x)
+
+
+
+
+< 12.    Prefix_sum (구간 합) Algorithm >
+간혹가다가 어디서부터 어디까지의 합을 구하라는 문제가 있는데, 그경우 하나하나 더해서 구할 경우 O(M-N)의 시간복잡도를 갖게된다. (N~M까지의 합)
+여기에 + 로 테스트 케이스가 여러개 주어지거나 할 경우, 시간초과가 발생할 수 있는데, 이경우 처음에만 테이블을 만들어주면 O(1)로 구간합을 구할 수 있는 prefix-sum 알고리즘을 사용하면 된다.
+즉, 값을 받아서 저장하는 것이 아닌, 그전까지의 값의 합 + 값을 배열에 저장하는 것이다.   -> 이렇게 테이블을 만들고 난 뒤에는 table[M]-table[N-1] 로 구간합을 구할 수 있으므로, O(1)의 시간 복잡도를 갖게된다.
+
+
+
+
+< 13.    소숫점 자릿수 얼마나 출력할지 정하기 >    ANCHOR
+#include <iostream>
+
+cout<<fixed;
+cout.precision(num);   <<<-- num만큼 소수점 자릿수가 출력되게 된다.
+
+
+
+
+< 14.    vector<bool> 의 효율성 >    ANCHOR ---> *** 효율성면에서 bool arr[] 보다 vector<bool>이 낫다.
+일반적으로 bool 타입의 경우 true, false 로  1비트만으로 나타낼 수 있는 자료형이나, 1byte(8bits)의 자리를 차지한다.  이 경우 비효율적일 수 있다.
+그런데 vector의 경우 bool을 C구조체의 비트필트처럼 1비트만 사용한다.  따라서 bool arr[] 보다는 vector<bool>을 사용하는 것이 더 cache hit rate, 메모리 적인 부분에서
+더 효율적이므로  vector을 사용하자
+(단, vector<bool>의 경우 1bit씩만 사용하므로, 주소로의 참조(?) 할 경우 문제가 발생할 수 있다고 한다.)
+
+
+
+
+< 15.    BFS를 사용하는 문제에서의 "동시" >    ANCHOR
+BFS()를 사용하는데에서의 동시에 찾는다, 동시에 확장한다, 동시에 이동한다 등의 내용이 있을 경우에는 BFS의 동시에 돌아가야하는 것들의 원소들을 처음에 모두 넣고 BFS을 돌려야 한다.
+만약 각각 따로따로 한개씩 넣고 각각 BFS을 돌리게 된다면, 먼저 돌린 BFS에서 방문했다는 이유로 뒤에 BFS는 방문하지 못하거나 하는 경우가 발생할 수 있다.   즉, 따라서 동시에라는 키워드가 주어진 BFS문제의 경우
+꼭 BFS에 원소를 어떻게 넣고 시작해야할지 먼저 고민해야한다.     EX) baekjoon 16920 
+
+
+
+
+< 16.     >
+
